@@ -22,7 +22,7 @@ H5Record aim to tackle TFRecord problems by compressing the dataset into [HDF5](
 1. Sentence Similarity
 
 ```python
-from h5record import H5Record, ImaFloatge, Sentence
+from h5record import H5Record, Float, Sentence
 
 schema = {
     'sentence1': String(name='sentence1'),
