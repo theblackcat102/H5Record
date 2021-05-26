@@ -1,22 +1,27 @@
 import h5py as h5
 import numpy as np
 
+try:
+    from PIL import Image as PImage
+except ImportError as e:
+    pass
+
 class Attribute():
 
     def append(self, h5, data):
         raise NotImplementedError
 
-    def transforms(self, data):
+    def transform(self, data):
         raise NotImplementedError
 
-class Label(Attribute):
+class Integer(Attribute):
     '''
         One dimensional data shape
     '''
     dtype = 'int64'
     def __init__(self, name='label'):
         self.name = name
-        self.shape = (None,)
+        self.shape = (None, )
         self.max_shape = (None, )
 
     def append(self, h5, data):
@@ -24,8 +29,27 @@ class Label(Attribute):
         h5[self.name][-data.shape[0]:] = data
         return h5
 
-    def transforms(self, data):
-        return np.array(data)
+    def transform(self, data):
+        return np.array([data])
+
+class Float(Attribute):
+    '''
+        One dimensional data shape
+    '''
+    dtype = 'float16'
+    def __init__(self, name='label'):
+        self.name = name
+        self.shape = (None, )
+        self.max_shape = (None, )
+
+    def append(self, h5, data):
+        h5[self.name].resize( h5[self.name].shape[0]+data.shape[0], axis=0)
+        h5[self.name][-data.shape[0]:] = data
+        return h5
+
+    def transform(self, data):
+        return np.array([data])
+
 
 class Image(Attribute):
 
@@ -39,13 +63,20 @@ class Image(Attribute):
         self.shape = (None, self.c, self.h, self.w)
         self.max_shape = (None, self.c, self.h, self.w)
 
+    def read_image(self, filename, resize=True): 
+        # read image by file path and return numpy object
+        img = PImage.open(filename)
+        if resize:
+            img  = img.resize((self.w, self.h))
+
+        return np.transpose(np.array(img), (2, 0, 1))
 
     def append(self, h5, data):
         h5[self.name].resize( h5[self.name].shape[0]+data.shape[0], axis=0)
         h5[self.name][-data.shape[0]:] = data
         return h5
 
-    def transforms(self, data):
+    def transform(self, data):
         data =  np.array(data)
         if len(data.shape) == 3: 
             # ensure data shape is B x C x H x W
@@ -79,7 +110,7 @@ class Sequence(Attribute):
         return h5
 
 
-    def transforms(self, data):
+    def transform(self, data):
         if isinstance(data, dict):
             assert self.sub_attributes is not None, "sub attributes not defined"
 

@@ -72,9 +72,11 @@ class H5Dataset(Dataset):
                         max_shape = list(attribute.max_shape)
                         max_shape[0] = self.data_length
                         max_shape = tuple(max_shape)
-                        shape = (len(value), 1)
                         if not isinstance(attribute, String):
                             shape = value.shape
+                        else:
+                            shape = (len(value), 1)
+
                         dset = fout.create_dataset(key,data=value, shape=shape, maxshape=max_shape, dtype=attribute.dtype )
             else:
                 with h5.File(self.save_filename, 'a', libver='latest', swmr=True) as fout:

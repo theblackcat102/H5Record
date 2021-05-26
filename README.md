@@ -14,7 +14,37 @@ Large dataset ( > 100G, <= 1T) storage format for Pytorch (wip)
 
 * However TFRecord port does not support data size evaluation (used frequently by Dataloader ), no index level access available ( important for data evaluation or verification )
 
-H5Record aim to tackle TFRecord problems by compressing the dataset into [HDF5](https://support.hdfgroup.org/HDF5/doc/TechNotes/BigDataSmMach.html) file with an easy to use interface through predefined interfaces ( String, Image, Sequences, Label).
+H5Record aim to tackle TFRecord problems by compressing the dataset into [HDF5](https://support.hdfgroup.org/HDF5/doc/TechNotes/BigDataSmMach.html) file with an easy to use interface through predefined interfaces ( String, Image, Sequences, Integer).
+
+
+### Simple usage
+
+1. Sentence Similarity
+
+```python
+from h5record import H5Record, ImaFloatge, Sentence
+
+schema = {
+    'sentence1': String(name='sentence1'),
+    'sentence2': String(name='sentence2'),
+    'label': Float(name='label')
+}
+data = [
+    ['Sent 1.', 'Sent 2', 0.1],
+    ['Sent 3', 'Sent 4', 0.2],
+]
+
+def pair_iter():
+    for row in data:
+        yield {
+            'sentence1': row[0],
+            'sentence2': row[1]
+        }
+
+dataset = H5Dataset(schema, './question_pair.h5', pair_iter())
+dataset[0]
+
+```
 
 
 ## Note
