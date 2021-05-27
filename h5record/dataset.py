@@ -77,7 +77,9 @@ class H5Dataset(Dataset):
                         else:
                             shape = (len(value), 1)
 
-                        dset = fout.create_dataset(key,data=value, shape=shape, maxshape=max_shape, dtype=attribute.dtype )
+                        dset = fout.create_dataset(key,data=value, shape=shape, 
+                            maxshape=max_shape, 
+                            dtype=attribute.dtype, compression=self.compression )
             else:
                 with h5.File(self.save_filename, 'a', libver='latest', swmr=True) as fout:
                     fout.swmr_mode = True 
