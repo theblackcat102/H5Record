@@ -52,6 +52,19 @@ for idx in range(len(dataset)):
 
 Due to in progress development, this package should be use in care in storage with FAT, FAT-32 format 
 
+## Comparison between different compression algorithm
+
+No chunking is used
+
+| Compression Type  | File size  | Read speed row/second  |
+|---|---|---|
+| no compression  | 2.0G  | 2084.55 it/s  |
+| lzf  | 1.7G  | 1496.14 it/s  |
+| gzip | 1.1G  | 843.78 it/s  |
+
+benchmarked in i7-9700, 1TB NVMe SSD
+
+
 ### TODO
 
 - [ ] Test combinations of different data modalities
