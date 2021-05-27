@@ -126,3 +126,13 @@ class TestDataModality(unittest.TestCase):
             assert data['caption'] == captions[idx]
 
         os.remove('img_caption.h5')
+
+
+        dataset = H5Dataset(schema, './img_caption.h5', pair_iter(),
+            compression='lzf')
+
+        for idx in range(len(image_path)):
+            data = dataset[idx]
+            assert data['caption'] == captions[idx]
+
+        os.remove('img_caption.h5')
