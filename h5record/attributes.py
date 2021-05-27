@@ -146,5 +146,5 @@ class String(Attribute):
 
     def transform(self, data):
         assert isinstance(data, str)
-        return [data.encode('unicode_escape')]
+        return [data]
 

@@ -35,7 +35,7 @@ class H5Dataset(Dataset):
 
     def __init__(self, schema, save_filename, data_iter=None,
         data_length=None, chunk_size=300, compression=None, 
-        transform=None, append_mode=False):
+        transform=None, append_mode=False, verbose=0):
 
         '''
         Note: 

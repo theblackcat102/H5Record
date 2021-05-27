@@ -51,6 +51,42 @@ class TestDataModality(unittest.TestCase):
 
         os.remove('question_pair.h5')
 
+
+    def test_unicode(self):
+        from h5record.dataset import H5Dataset
+        from h5record.attributes import String, Integer
+        schema = {
+            'sentence1': String(name='sentence1'),
+            'sentence2': String(name='sentence2'),
+            'label': Integer(name='label')
+        }
+
+        data = [
+            [  '小明去學校', '結果已經下課了', 0]
+        ]
+
+        def pair_iter():
+            for row in data:
+                yield {
+                    'sentence1': row[0],
+                    'sentence2': row[1],
+                    'label': row[2]
+                }
+        if os.path.exists('question_pair.h5'):
+            os.remove('question_pair.h5')
+
+        dataset = H5Dataset(schema, './question_pair.h5', pair_iter())
+        for idx in range(len(data)):
+            row = dataset[idx]
+            sent1, sent2, label = data[idx]
+
+            assert sent1 == row['sentence1']
+            assert sent2 == row['sentence2']
+            assert label == row['label']
+
+        os.remove('question_pair.h5')
+
+
     def test_image_string_pair(self):
         from h5record.dataset import H5Dataset
         from h5record.attributes import String, Image

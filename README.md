@@ -42,7 +42,8 @@ def pair_iter():
         }
 
 dataset = H5Dataset(schema, './question_pair.h5', pair_iter())
-dataset[0]
+for idx in range(len(dataset)):
+    print(dataset[idx])
 
 ```
 
