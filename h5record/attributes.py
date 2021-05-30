@@ -68,6 +68,11 @@ class Image(Attribute):
         img = PImage.open(filename)
         if resize:
             img  = img.resize((self.w, self.h))
+        np_img = np.array(img)
+        np_img = np.array(img)
+        if len(np_img.shape) == 2:
+            np_img = np.expand_dims(np_img, -1)
+            np_img = np.repeat(np_img, 3, axis=-1)
 
         return np.transpose(np.array(img), (2, 0, 1))
 

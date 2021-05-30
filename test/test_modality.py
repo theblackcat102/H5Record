@@ -100,7 +100,8 @@ class TestDataModality(unittest.TestCase):
             'Lenna profile',
             'Lenna back patch',
             'Lenna lower patch',
-            'meme image'
+            'meme image', 
+            'greyscale image'
         ]
 
         image_path = [
@@ -108,6 +109,7 @@ class TestDataModality(unittest.TestCase):
             'test/images/2.jpeg',
             'test/images/3.jpeg',
             'test/images/4.jpeg',
+            'test/images/5.jpeg',
         ]
         def pair_iter():
             for (caption, img_path) in zip(captions, image_path):
