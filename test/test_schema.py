@@ -174,7 +174,7 @@ class TestDataModality(unittest.TestCase):
         '''
             Suitable for tokenized sequences
         '''
-        from h5record.attributes import Sequence, FloatSequence
+        from h5record.attributes import Sequence, FloatSequence, Float16Sequence
         import numpy as np
 
         schema = ( 
@@ -224,6 +224,23 @@ class TestDataModality(unittest.TestCase):
             row = dataset[idx]
             assert (row['seq1'][0] - data[idx][0]).sum() < 1e-6
             assert (row['seq2'][0] - data[idx][1]).sum() < 1e-6
+
+        os.remove('tokens.h5')
+
+        schema = ( 
+            Float16Sequence(name='seq1'),
+            Float16Sequence(name='seq2')
+        )
+        if os.path.exists('tokens.h5'):
+            os.remove('tokens.h5')
+
+        dataset = H5Dataset(schema, './tokens.h5', pair_iter(),
+            data_length=len(data), chunk_size=4)
+
+        for idx in range(len(data)):
+            row = dataset[idx]
+            assert (row['seq1'][0] - data[idx][0]).mean() < 1e-3
+            assert (row['seq2'][0] - data[idx][1]).mean() < 1e-3
 
         os.remove('tokens.h5')
 
