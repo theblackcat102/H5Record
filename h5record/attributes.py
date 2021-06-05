@@ -51,7 +51,7 @@ class Float(Attribute):
     '''
         One dimensional data shape
     '''
-    dtype = 'float16'
+    dtype = 'float32'
     def __init__(self, name='label'):
         self.name = name
         self.shape = (None, )
@@ -64,6 +64,12 @@ class Float(Attribute):
 
     def transform(self, data):
         return np.array([data])
+
+class Float16(Float):
+    '''
+        One dimensional data shape
+    '''
+    dtype = 'float16'
 
 
 class Image(Attribute):
