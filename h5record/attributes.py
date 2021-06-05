@@ -168,7 +168,7 @@ class Sequence(Attribute):
         self.name = name
         self.shape = (1, 1, )
         self.sub_attributes = sub_attributes
-        self.max_shape = (None, 1)
+        self.max_shape = (None, 1, )
 
 
     def append(self, h5, data):
@@ -180,7 +180,7 @@ class Sequence(Attribute):
                 h5[self.name + '_'+key][-np_seq.shape[0]:] = np_seq
         elif isinstance(data, np.ndarray):
             h5[self.name].resize( h5[self.name].shape[0]+data.shape[0], axis=0)
-            h5[self.name][-np_seq.shape[0]:] = np_seq
+            h5[self.name][-data.shape[0]:] = data
         else:
             raise ValueError("invalid data type: {}".format(type(data)))
 
@@ -198,12 +198,33 @@ class Sequence(Attribute):
                     data[key] = np_seq
             return data
         elif isinstance(data, np.ndarray):
-            if len(data.shape) == 2: 
+            if len(data.shape) == 1:
                 # make sure its B x 1 x sequence length
-                np_seq = np.array([data], dtype=self.dtype)
-            return np_seq
+                data = np.array([data], dtype=self.dtype)
+            return data
         else:
             raise ValueError("invalid data type: {}".format(type(data)))
+
+    def init_attributes(self, fout, value, compression, data_length):
+        max_shape = self.max_shape
+        max_shape = list(self.max_shape)
+        max_shape[0] = data_length
+        max_shape = tuple(max_shape)
+
+        dset = fout.create_dataset(self.name, 
+            shape=self.shape,
+            maxshape=max_shape,
+            dtype=self.dtype, 
+            compression=compression )
+        dset[0] = value
+
+# hard to define how small float should be
+class FloatSequence(Sequence):
+    dtype = h5.special_dtype(vlen=np.dtype('float32'))
+
+class Float16Sequence(Sequence):
+    dtype = h5.special_dtype(vlen=np.dtype('float16'))
+
 
 class String(Attribute):
 

@@ -1,11 +1,11 @@
 import unittest
 import os
+from h5record.dataset import H5Dataset
 
 class TestDataModality(unittest.TestCase):
 
 
     def test_list_based_schema(self):
-        from h5record.dataset import H5Dataset
         from h5record.attributes import String, Integer, Image
 
         img_attr = Image(name='image', h=32, w=32)
@@ -62,7 +62,6 @@ class TestDataModality(unittest.TestCase):
         os.remove('question_image_pair.h5')
 
     def test_tuple_based_schema(self):
-        from h5record.dataset import H5Dataset
         from h5record.attributes import String, Integer, Image
 
         img_attr = Image(name='image', h=32, w=32)
@@ -120,7 +119,6 @@ class TestDataModality(unittest.TestCase):
 
 
     def test_dict_based_schema(self):
-        from h5record.dataset import H5Dataset
         from h5record.attributes import String, Image
 
         schema = {
@@ -169,3 +167,63 @@ class TestDataModality(unittest.TestCase):
             assert data['caption'] == captions[idx]
 
         os.remove('img_caption.h5')
+
+
+
+    def test_seq_schema(self):
+        '''
+            Suitable for tokenized sequences
+        '''
+        from h5record.attributes import Sequence, FloatSequence
+        import numpy as np
+
+        schema = ( 
+            Sequence(name='seq1'),
+            Sequence(name='seq2')
+        )
+
+        data = [
+            [  np.array([ 0, 1, 2, 3 ]), np.array([  1, 2, 3 ])  ],
+            [  np.array([ 0, 1, 2, 3, 4, 5 ]), np.array([  1, 2, 3, 3 ])  ],
+            [  np.array([ 0, 1, 2 ]), np.array([  1, 2, -1 ])  ],
+        ]
+        def pair_iter():
+            for (seq1, seq2) in data:
+                yield {
+                    'seq1': seq1,
+                    'seq2': seq2
+                }
+        if os.path.exists('tokens.h5'):
+            os.remove('tokens.h5')
+
+        dataset = H5Dataset(schema, './tokens.h5', pair_iter(),
+            data_length=len(data), chunk_size=4)
+
+        for idx in range(len(data)):
+            row = dataset[idx]
+            assert (row['seq1'][0] == data[idx][0]).all()
+
+        os.remove('tokens.h5')
+
+        data = [
+            [  np.array([ 0.1, 1, 2, 3 ]), np.array([  1, 2.13, 3 ])  ],
+            [  np.array([ 0.11, 1, 2, 3, 4, 5 ]), np.array([  1, 2, 3.33333333, 3 ])  ],
+            [  np.array([ 3.14159, 1, 2 ]), np.array([  1.988, 2, -1 ])  ],
+        ]
+        schema = ( 
+            FloatSequence(name='seq1'),
+            FloatSequence(name='seq2')
+        )
+        if os.path.exists('tokens.h5'):
+            os.remove('tokens.h5')
+
+        dataset = H5Dataset(schema, './tokens.h5', pair_iter(),
+            data_length=len(data), chunk_size=4)
+
+        for idx in range(len(data)):
+            row = dataset[idx]
+            assert (row['seq1'][0] - data[idx][0]).sum() < 1e-6
+            assert (row['seq2'][0] - data[idx][1]).sum() < 1e-6
+
+        os.remove('tokens.h5')
+
