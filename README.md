@@ -22,7 +22,7 @@ H5Record aim to tackle TFRecord problems by compressing the dataset into [HDF5](
 1. Sentence Similarity
 
 ```python
-from h5record import H5Record, Float, Sentence
+from h5record import H5Dataset, Float, String
 
 schema = (
     String(name='sentence1'),
@@ -38,7 +38,8 @@ def pair_iter():
     for row in data:
         yield {
             'sentence1': row[0],
-            'sentence2': row[1]
+            'sentence2': row[1],
+            'label': row[2]
         }
 
 dataset = H5Dataset(schema, './question_pair.h5', pair_iter())

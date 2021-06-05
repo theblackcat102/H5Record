@@ -61,7 +61,7 @@ class H5Dataset(Dataset):
 
         self.reader = h5.File(self.save_filename, 'r')
         first_key = list(self.schema.keys())[0]
-        self.num_entries = self.reader[first_key].shape[0]-1
+        self.num_entries = self.reader[first_key].shape[0]
 
 
     def preprocess(self, data_iter):

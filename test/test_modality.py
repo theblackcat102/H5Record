@@ -30,6 +30,9 @@ class TestDataModality(unittest.TestCase):
             os.remove('question_pair.h5')
 
         dataset = H5Dataset(schema, './question_pair.h5', pair_iter())
+
+        assert len(dataset) == len(data)
+
         for idx in range(len(data)):
             row = dataset[idx]
             sent1, sent2, label = data[idx]
@@ -41,6 +44,7 @@ class TestDataModality(unittest.TestCase):
 
         dataset = H5Dataset(schema, './question_pair.h5', pair_iter(),
             data_length=len(data), chunk_size=4)
+        assert len(dataset) == len(data)
 
         for idx in range(len(data)):
             row = dataset[idx]
@@ -76,6 +80,8 @@ class TestDataModality(unittest.TestCase):
             os.remove('question_pair.h5')
 
         dataset = H5Dataset(schema, './question_pair.h5', pair_iter())
+        assert len(dataset) == len(data)
+
         for idx in range(len(data)):
             row = dataset[idx]
             sent1, sent2, label = data[idx]
@@ -122,6 +128,7 @@ class TestDataModality(unittest.TestCase):
 
         dataset = H5Dataset(schema, './img_caption.h5', pair_iter(),
             data_length=len(image_paths), chunk_size=4)
+        assert len(dataset) == len(captions)
 
         for idx in range(len(image_paths)):
             data = dataset[idx]
