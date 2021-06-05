@@ -66,16 +66,7 @@ No chunking is used
 benchmarked in i7-9700, 1TB NVMe SSD
 
 
-### TODO
 
-- [ ] Test combinations of different data modalities
-
-- [ ] Do more tuning and experiments on different driver settings
-
-- [ ] Performance benchmark:
-
-    - [ ] Performance comparison between zip in multiple workers ( I suspect there's some improvement to be done here )
-
-    - [ ] In memory (dataset[:]) access vs no compression
+If you are interested to learn more feel free to checkout the [note](NOTES.md) as well!
 
 
