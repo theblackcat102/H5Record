@@ -24,11 +24,11 @@ H5Record aim to tackle TFRecord problems by compressing the dataset into [HDF5](
 ```python
 from h5record import H5Record, Float, Sentence
 
-schema = {
-    'sentence1': String(name='sentence1'),
-    'sentence2': String(name='sentence2'),
-    'label': Float(name='label')
-}
+schema = (
+    String(name='sentence1'),
+    String(name='sentence2'),
+    Float(name='label')
+)
 data = [
     ['Sent 1.', 'Sent 2', 0.1],
     ['Sent 3', 'Sent 4', 0.2],

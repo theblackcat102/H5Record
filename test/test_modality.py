@@ -104,7 +104,7 @@ class TestDataModality(unittest.TestCase):
             'greyscale image'
         ]
 
-        image_path = [
+        image_paths = [
             'test/images/1.jpeg',
             'test/images/2.jpeg',
             'test/images/3.jpeg',
@@ -112,18 +112,18 @@ class TestDataModality(unittest.TestCase):
             'test/images/5.jpeg',
         ]
         def pair_iter():
-            for (caption, img_path) in zip(captions, image_path):
+            for (caption, img_path) in zip(captions, image_paths):
                 yield {
-                    'image': schema['image'].read_image(image_path[0]),
+                    'image': schema['image'].read_image(img_path),
                     'caption': caption
                 }
         if os.path.exists('img_caption.h5'):
             os.remove('img_caption.h5')
 
         dataset = H5Dataset(schema, './img_caption.h5', pair_iter(),
-            data_length=len(image_path), chunk_size=4)
+            data_length=len(image_paths), chunk_size=4)
 
-        for idx in range(len(image_path)):
+        for idx in range(len(image_paths)):
             data = dataset[idx]
             assert data['caption'] == captions[idx]
 
@@ -133,7 +133,7 @@ class TestDataModality(unittest.TestCase):
         dataset = H5Dataset(schema, './img_caption.h5', pair_iter(),
             compression='lzf')
 
-        for idx in range(len(image_path)):
+        for idx in range(len(image_paths)):
             data = dataset[idx]
             assert data['caption'] == captions[idx]
 

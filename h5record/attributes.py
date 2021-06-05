@@ -74,7 +74,7 @@ class Image(Attribute):
             np_img = np.expand_dims(np_img, -1)
             np_img = np.repeat(np_img, 3, axis=-1)
 
-        return np.transpose(np.array(img), (2, 0, 1))
+        return np.transpose(np_img, (2, 0, 1))
 
     def append(self, h5, data):
         h5[self.name].resize( h5[self.name].shape[0]+data.shape[0], axis=0)

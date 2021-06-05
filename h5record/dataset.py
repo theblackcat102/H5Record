@@ -43,6 +43,10 @@ class H5Dataset(Dataset):
             * chunk size affects reading speed, usually a size of 100-500 is suitable value
             * compression algorithm affects reading speed, so if storage is not your concern is recommended not to enable
         '''
+
+        # normalized schema design to dictionary
+        if isinstance(schema, list) or isinstance(schema, tuple):
+            schema = {  s.name: s  for s in schema }
         self.schema = schema
         self.save_filename = save_filename
         self.data_length = data_length # dataset maximum size
