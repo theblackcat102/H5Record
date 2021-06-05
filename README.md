@@ -72,6 +72,10 @@ benchmarked in i7-9700, 1TB NVMe SSD
 
 - [ ] Do more tuning and experiments on different driver settings
 
-- [ ] Performance benchmark
+- [ ] Performance benchmark:
+
+    - [ ] Performance comparison between zip in multiple workers ( I suspect there's some improvement to be done here )
+
+    - [ ] In memory (dataset[:]) access vs no compression
 
 

@@ -3,7 +3,7 @@ import numpy as np
 from torch.utils.data.dataset import Dataset
 import os
 from .attributes import (
-    String
+    String, ImageSequence
 )
 
 class AtomicFile:
@@ -72,19 +72,8 @@ class H5Dataset(Dataset):
                     fout.swmr_mode = True 
                     for key, value in data.items():
                         attribute = self.schema[key]
-                        value = attribute.transform(value)
-                        max_shape = list(attribute.max_shape)
-                        max_shape[0] = self.data_length
-                        max_shape = tuple(max_shape)
-                        if not isinstance(attribute, String):
-                            shape = value.shape
-                        else:
-                            shape = (len(value), 1)
-
-                        dset = fout.create_dataset(key,data=value, shape=shape, 
-                            maxshape=max_shape, 
-                            dtype=attribute.dtype, 
-                            compression=self.compression )
+                        attribute.init_attributes(fout, value, 
+                            self.compression, self.data_length)
             else:
                 with h5.File(self.save_filename, 'a', libver='latest', swmr=True) as fout:
                     fout.swmr_mode = True 
@@ -103,8 +92,16 @@ class H5Dataset(Dataset):
         data = {}
         for key in self.schema.keys():
             raw_output = self.reader[key][idx]
-            if isinstance(self.schema[key], String):
-                data[key] = raw_output[0].decode(self.schema[key].encoding )
+            attribute = self.schema[key]
+            if isinstance(attribute, String):
+                data[key] = raw_output[0].decode(attribute.encoding )
+            elif isinstance(attribute, ImageSequence):
+                # heavy reshaping is needed as variable length dimension (last dimension)
+                # is always treated as np.array
+                # rendering high dimension shape becomes a np.object matrix
+                # 
+                data[key] = raw_output[0].reshape(
+                    attribute.img_channel, attribute.w, attribute.h, -1  )
             else:
                 data[key] = raw_output
 

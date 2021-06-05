@@ -3,6 +3,7 @@ import numpy as np
 
 try:
     from PIL import Image as PImage
+    from PIL import ImageSequence as PImageSequence
 except ImportError as e:
     pass
 
@@ -13,6 +14,20 @@ class Attribute():
 
     def transform(self, data):
         raise NotImplementedError
+
+
+    def init_attributes(self, fout, value, compression, data_length):
+        value = self.transform(value)
+        max_shape = list(self.max_shape)
+        max_shape[0] = data_length
+        max_shape = tuple(max_shape)
+
+        shape = value.shape
+        fout.create_dataset(self.name, data=value, shape=shape, 
+            maxshape=max_shape, 
+            dtype=self.dtype, 
+            compression=compression )
+
 
 class Integer(Attribute):
     '''
@@ -69,7 +84,6 @@ class Image(Attribute):
         if resize:
             img  = img.resize((self.w, self.h))
         np_img = np.array(img)
-        np_img = np.array(img)
         if len(np_img.shape) == 2:
             np_img = np.expand_dims(np_img, -1)
             np_img = np.repeat(np_img, 3, axis=-1)
@@ -88,6 +102,64 @@ class Image(Attribute):
             data = np.expand_dims(data, axis=0)
         return data
 
+class ImageSequence(Attribute):
+    dtype = h5.special_dtype(vlen=np.dtype('uint8'))
+    img_channel = 3
+
+    def __init__(self, h, w, c=3, name='img_seq'):
+        self.c = c
+        self.h = h
+        self.w = w
+        self.name = name
+
+        self.shape = (1, 1, )
+        self.max_shape = (None, 1, )
+
+    def read_gif(self, filename, resize=True): 
+        # read image by file path and return numpy object
+        # Channel x H x W x Length
+        gif = PImage.open(filename)
+        np_images = []
+        for frame in PImageSequence.Iterator(gif):
+            if resize:
+                frame  = frame.resize((self.w, self.h))
+            np_img = np.array(frame)
+            if len(np_img.shape) == 2:
+                np_img = np.expand_dims(np_img, -1)
+                np_img = np.repeat(np_img, self.img_channel, axis=-1)
+            np_images.append(np_img)
+        gif.close()
+        np_images = np.stack(np_images)
+
+        return np.transpose(np_images.astype(self.dtype), (3, 1, 2, 0)).flatten()
+
+
+    def transform(self, data):
+        data =  np.array(data)
+        if len(data.shape) == 1: 
+            # make sure its  1 x C x H x W x sequence length
+            data = np.array([data.flatten() ], dtype=self.dtype)
+        return data
+
+    def append(self, h5, data):
+        h5[self.name].resize( h5[self.name].shape[0]+data.shape[0], axis=0)
+        h5[self.name][-1] = data
+        return h5
+
+    def init_attributes(self, fout, value, compression, data_length):
+        max_shape = self.max_shape
+        max_shape = list(self.max_shape)
+        max_shape[0] = data_length
+        max_shape = tuple(max_shape)
+
+        dset = fout.create_dataset(self.name, 
+            shape=self.shape,
+            maxshape=max_shape,
+            dtype=self.dtype, 
+            compression=compression )
+        dset[0] = value
+
+
 class Sequence(Attribute):
 
     dtype = h5.special_dtype(vlen=np.dtype('int32'))
@@ -103,11 +175,11 @@ class Sequence(Attribute):
         if isinstance(data, dict):
             for key in self.sub_attributes:
                 np_seq = data[key]
-                np_seq = np.array([np_seq], dtype=self.dtype)
+                # np_seq = np.array([np_seq], dtype=self.dtype)
                 h5[self.name + '_'+key].resize( h5[self.name + '_'+key].shape[0]+np_seq.shape[0], axis=0)
                 h5[self.name + '_'+key][-np_seq.shape[0]:] = np_seq
         elif isinstance(data, np.ndarray):
-            h5[self.name].resize( h5[self.name].shape[0]+np_seq.shape[0], axis=0)
+            h5[self.name].resize( h5[self.name].shape[0]+data.shape[0], axis=0)
             h5[self.name][-np_seq.shape[0]:] = np_seq
         else:
             raise ValueError("invalid data type: {}".format(type(data)))
@@ -153,3 +225,15 @@ class String(Attribute):
         assert isinstance(data, str)
         return [data]
 
+    def init_attributes(self, fout, value, compression, data_length):
+        value = self.transform(value)
+        max_shape = list(self.max_shape)
+        max_shape[0] = data_length
+        max_shape = tuple(max_shape)
+
+        shape = (len(value), 1)
+
+        fout.create_dataset(self.name, data=value, shape=shape, 
+            maxshape=max_shape, 
+            dtype=self.dtype, 
+            compression=compression )
