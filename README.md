@@ -2,6 +2,7 @@
 
 Large dataset ( > 100G, <= 1T) storage format for Pytorch (wip) 
 
+
 ## Why?
 
 * Writing large dataset is still a wild west in pytorch. Approaches seen in the wild include:
@@ -16,8 +17,22 @@ Large dataset ( > 100G, <= 1T) storage format for Pytorch (wip)
 
 H5Record aim to tackle TFRecord problems by compressing the dataset into [HDF5](https://support.hdfgroup.org/HDF5/doc/TechNotes/BigDataSmMach.html) file with an easy to use interface through predefined interfaces ( String, Image, Sequences, Integer).
 
+Some advantage of using H5Record
+
+* Support multi-process read
+
+* Relatively simple to use and low technical debt
+
+* Support compression/de-compression on the fly
+
+* Quick load to memory if required
 
 ### Simple usage
+
+```
+pip install h5record
+```
+
 
 1. Sentence Similarity
 

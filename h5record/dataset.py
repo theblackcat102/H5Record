@@ -35,7 +35,7 @@ class H5Dataset(Dataset):
 
     def __init__(self, schema, save_filename, data_iter=None,
         data_length=None, chunk_size=300, compression=None, 
-        transform=None, append_mode=False, verbose=0):
+        transform=None, append_mode=False, verbose=0, to_memory=False):
 
         '''
         Note: 
@@ -63,6 +63,13 @@ class H5Dataset(Dataset):
         first_key = list(self.schema.keys())[0]
         self.num_entries = self.reader[first_key].shape[0]
 
+
+        if to_memory:
+            # warning this may use all your memory
+            temp = {}
+            for key in self.schema.keys():
+                temp[key] = self.reader[key][:]
+            self.reader = temp
 
     def preprocess(self, data_iter):
         idx = 0
