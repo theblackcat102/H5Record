@@ -43,6 +43,9 @@ class H5Dataset(Dataset):
             * data length must be known value otherwise chunk size will not be enabled
             * chunk size affects reading speed, usually a size of 100-500 is suitable value
             * compression algorithm affects reading speed, so if storage is not your concern is recommended not to enable
+        multiprocess: 
+            if such error occur  "OSError: Can't read data (address of object past end of allocation)"
+            set it to True
         '''
 
         # normalized schema design to dictionary
