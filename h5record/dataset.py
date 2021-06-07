@@ -35,7 +35,8 @@ class H5Dataset(Dataset):
 
     def __init__(self, schema, save_filename, data_iter=None,
         data_length=None, chunk_size=300, compression=None, 
-        transform=None, append_mode=False, verbose=0, to_memory=False):
+        transform=None, append_mode=False, verbose=0, 
+        to_memory=False, multiprocess=False):
 
         '''
         Note: 
@@ -59,7 +60,11 @@ class H5Dataset(Dataset):
         if not os.path.exists(self.save_filename):
             self.preprocess(data_iter)
 
-        self.reader = h5.File(self.save_filename, 'r')
+        if multiprocess:
+            self.reader = h5.File(AtomicFile(self.save_filename), 'r')
+        else:
+            self.reader = h5.File(self.save_filename, 'r')
+
         first_key = list(self.schema.keys())[0]
         self.num_entries = self.reader[first_key].shape[0]
 
