@@ -32,7 +32,7 @@ test_requirements = [
 
 setup(
     name='h5record',
-    version='1.0.3',
+    version='1.0.4',
     description='Large data storage for pytorch',
     long_description=readme,
     long_description_content_type="text/markdown",
