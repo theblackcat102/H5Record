@@ -2,6 +2,12 @@
 
 Large dataset ( > 100G, <= 1T) storage format for Pytorch (wip) 
 
+Support python 3
+
+```
+pip install h5record
+```
+
 
 ## Why?
 
