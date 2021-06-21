@@ -63,10 +63,10 @@ class H5Dataset(Dataset):
         if not os.path.exists(self.save_filename):
             self.preprocess(data_iter)
 
-        if multiprocess:
+        if multiprocess: # this is a backup method to ensure multiprocessing support on old file
             self.reader = h5.File(AtomicFile(self.save_filename), 'r')
         else:
-            self.reader = h5.File(self.save_filename, 'r')
+            self.reader = h5.File(self.save_filename, 'r', swmr=True)
 
         first_key = list(self.schema.keys())[0]
         self.num_entries = self.reader[first_key].shape[0]
@@ -83,14 +83,14 @@ class H5Dataset(Dataset):
         idx = 0
         for data in data_iter:
             if idx == 0:
-                with h5.File(self.save_filename, 'w', libver='latest', swmr=True) as fout:
+                with h5.File(self.save_filename, 'w', libver='latest') as fout:
                     fout.swmr_mode = True 
                     for key, value in data.items():
                         attribute = self.schema[key]
                         attribute.init_attributes(fout, value, 
                             self.compression, self.data_length)
             else:
-                with h5.File(self.save_filename, 'a', libver='latest', swmr=True) as fout:
+                with h5.File(self.save_filename, 'a', libver='latest') as fout:
                     fout.swmr_mode = True 
                     for key, value in data.items():
                         attribute = self.schema[key]
