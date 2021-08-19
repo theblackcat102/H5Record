@@ -1,4 +1,5 @@
 # H5Record
+[![codecov](https://codecov.io/gh/theblackcat102/H5Record/branch/main/graph/badge.svg?token=WJQ0DEPL38)](https://codecov.io/gh/theblackcat102/H5Record)  [![PyPI version](https://badge.fury.io/py/h5record.svg)](https://badge.fury.io/py/h5record)
 
 Large dataset ( > 100G, <= 1T) storage format for Pytorch (wip) 
 
